@@ -25,14 +25,36 @@ void InsertionSortQueue();
 int main()
 {
 	InitProcesses(Procs);
-	int Index = 0;
-	for(; Index < PROC_COUNT; ++Index)
+	for(int Index = 0; Index < PROC_COUNT; ++Index)
 	{
 		EnqueueReady(Index);
 	}
 	InsertionSortQueue();
+
+	float WaitingTime[PROC_COUNT];
+	float TurningTime[PROC_COUNT];
+
+	float AWT = 0.0f;
+	float ATT = 0.0f;
+
+	for(int Index = 0; Index < PROC_COUNT; ++Index)
+	{
+		 Index == 0 ? WaitingTime[Index] = 0.0f : WaitingTime[Index] = WaitingTime[Index - 1] + ReadyQueue[Index - 1]->BurstTime;
+		 TurningTime[Index] = WaitingTime[Index] + ReadyQueue[Index]->BurstTime;
+		 AWT += WaitingTime[Index];
+		 ATT += TurningTime[Index];
+	}
+
+	AWT /= PROC_COUNT;
+	ATT /= PROC_COUNT;
 	
-	printf("Hello World");
+	for (int Index = 0; Index < PROC_COUNT; ++Index)
+	{
+		printf("%s\tBurst Time = %.2f | WT = %.2f | TT = %.2f\n", ReadyQueue[Index]->Name, ReadyQueue[Index]->BurstTime
+			, WaitingTime[Index], TurningTime[Index]);
+	}
+	printf("AWT = %f\nATT = %f\n", AWT, ATT);
+
 	return 0;
 }
 
@@ -44,8 +66,7 @@ void InitProcesses(Process* procs)
 	procs[3].BurstTime = 1.0f;
 	procs[4].BurstTime = 1.0f;
 
-	int Index = 0;
-	for(; Index < PROC_COUNT; ++Index)
+	for(int Index = 0; Index < PROC_COUNT; ++Index)
 	{
 		procs[Index].ID = Index;
 		strcpy_s(procs[Index].Name, "Process ");
@@ -69,8 +90,7 @@ void EnqueueReady(int ProcIndex)
 
 void InsertionSortQueue()
 {
-	int SortHead = 1;
-	for (; SortHead < PROC_COUNT; ++SortHead)
+	for (int SortHead = 1; SortHead < PROC_COUNT; ++SortHead)
 	{
 		Process* Key = ReadyQueue[SortHead];
 		int Iterator = SortHead - 1;
