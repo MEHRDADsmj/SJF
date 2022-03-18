@@ -19,14 +19,18 @@ int QueueLast = -1;
 void InitProcesses(Process*);
 void EnqueueReady(int);
 
+// Since the array is super small, I preferred to use insertion sort
+void InsertionSortQueue();
+
 int main()
 {
 	InitProcesses(Procs);
-	EnqueueReady(2);
-	EnqueueReady(0);
-	EnqueueReady(4);
-	EnqueueReady(3);
-	EnqueueReady(1);
+	int Index = 0;
+	for(; Index < PROC_COUNT; ++Index)
+	{
+		EnqueueReady(Index);
+	}
+	InsertionSortQueue();
 	
 	printf("Hello World");
 	return 0;
@@ -34,9 +38,9 @@ int main()
 
 void InitProcesses(Process* procs)
 {
-	procs[0].BurstTime = 1.0f;
-	procs[1].BurstTime = 1.0f;
-	procs[2].BurstTime = 1.0f;
+	procs[0].BurstTime = 2.0f;
+	procs[1].BurstTime = 2.0f;
+	procs[2].BurstTime = 3.0f;
 	procs[3].BurstTime = 1.0f;
 	procs[4].BurstTime = 1.0f;
 
@@ -61,4 +65,20 @@ void EnqueueReady(int ProcIndex)
 	}
 	
 	ReadyQueue[QueueLast] = &Procs[ProcIndex];
+}
+
+void InsertionSortQueue()
+{
+	int SortHead = 1;
+	for (; SortHead < PROC_COUNT; ++SortHead)
+	{
+		Process* Key = ReadyQueue[SortHead];
+		int Iterator = SortHead - 1;
+		while (Iterator > -1 && ReadyQueue[Iterator]->BurstTime > Key->BurstTime)
+		{
+			ReadyQueue[Iterator + 1] = ReadyQueue[Iterator];
+			--Iterator;
+		}
+		ReadyQueue[Iterator + 1] = Key;
+	}
 }
